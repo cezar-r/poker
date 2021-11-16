@@ -28,6 +28,7 @@ class Table:
 		self.players_in_hand = self.players.copy()
 		cards = self._cards.copy()
 		random.shuffle(cards)
+		self.call_amount = BIG_BLIND_AMOUNT
 		self.pot_value = BIG_BLIND_AMOUNT + LITTLE_BLIND_AMOUNT
 
 		# deal cards
