@@ -8,6 +8,7 @@ class WinnerCalculator():
 		self.community = community
 		self.winning_hand = ''
 		self.winners = []
+		self.scores = []
 		self.best_score_per_player = {}
 		self.check()
 
@@ -20,9 +21,11 @@ class WinnerCalculator():
 	def compare(self):
 		best_hands = dict(sorted(list(self.best_score_per_player.items()), key = lambda x: x[1])[::-1])
 		best_score = list(best_hands.values())[0]
+		print(best_hands)
 		for player, score in list(best_hands.items()):
 			if score == best_score:
 				self.winners.append(player)
+				self.scores.append(score)
 		
 
 
@@ -38,9 +41,9 @@ class WinnerCalculator():
 						2 : 'One Pair',
 						1 : 'High Card'}
 
-		print(score_hand_dict[list(self.best_score_per_player.values())[0] // 14])
-		for winner in self.winners:
-			print(winner.name, winner.hand)
+		print(score_hand_dict[sorted(list(self.best_score_per_player.values()))[-1] // 14])
+		for winner, score in list(zip(self.winners, self.scores)):
+			print(winner.name, winner.hand, score)
 		print(self.community)
 
 
@@ -76,8 +79,9 @@ class WinnerCalculator():
 	def straight_flush(self, player):
 		best_hand = self._suit_dict(player)
 		for suit in best_hand:
-			if self._check_straight(best_hand[suit]):
-				self.best_score_per_player[player] = 9 * 14 + max(best_hand[suit]) - 1
+			straight = self._check_straight(best_hand[suit])
+			if straight:
+				self.best_score_per_player[player] = 9 * 14 + straight - 1
 				self.winning_hand = 'Straight Flush'
 				return
 
@@ -122,10 +126,11 @@ class WinnerCalculator():
 
 
 
-	def straight(self, player): 
+	def straight(self, player): # 
 		values = [card.int_value for card in player.hand + self.community]
-		if self._check_straight(values):
-			self.best_score_per_player[player] = 5 * 14 + max(values) - 1
+		straight = self._check_straight(values)
+		if straight:
+			self.best_score_per_player[player] = 5 * 14 + straight - 1
 			self.winning_hand = 'Straight'
 			return
 
@@ -147,10 +152,11 @@ class WinnerCalculator():
 		for value in best_hand:
 			if len(best_hand[value]) == 2:
 				if has_two:
-					self.best_score_per_player[player] = 3 * 14 + value - 1
+					self.best_score_per_player[player] = score 
 					self.winning_hand = 'Two Pair'
 					return
 				has_two = True
+				score = 3 * 14 + value - 1
 
 
 	def one_pair(self, player):
@@ -208,17 +214,20 @@ class WinnerCalculator():
 	def _check_straight(self, values):
 		prev_value = 0
 		in_a_row = 1
+		straight = []
 		if 14 in values:
 			values.append(1)
 		values = sorted(values)
 		for value in values:
-			if value - prev_value <= 1:
+			if value - prev_value == 1:
 				in_a_row += 1
+				straight.append(value)
 				if in_a_row == 5:
-					return True
-			else:
+					return max(straight)
+			elif value != prev_value:
 				in_a_row = 1
 			prev_value = value
+		return False
 
 
 if __name__ == '__main__':

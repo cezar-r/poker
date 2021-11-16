@@ -224,7 +224,7 @@ class Table:
 			print()
 			print(player.amount)
 			print()
-		print("Community: ", end = "")
+		print("Board: ", end = "")
 		for card in self.community_cards:
 			print(card.value + " " + card.suit + " ", end = "")
 		print('\n')

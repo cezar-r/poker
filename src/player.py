@@ -24,7 +24,7 @@ class Player():
 
 
 	def decision(self, amount):
-		decision = input(f'\nTo call: {amount - self.put_in}\n{self.name}\nCall[1]\tFold[2]\tRaise[3]')
+		decision = input(f'\nTo call: {amount - self.put_in}\n{self.name}\nCall[1]\tFold[2]\tRaise[3]\n')
 		if decision == '3':
 			raise_amount = int(input('Raise by how much?\n'))
 			assert raise_amount <= self.amount
