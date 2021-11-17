@@ -21,7 +21,8 @@ class WinnerCalculator():
 	def compare(self):
 		best_hands = dict(sorted(list(self.best_score_per_player.items()), key = lambda x: x[1])[::-1])
 		best_score = list(best_hands.values())[0]
-		print(best_hands)
+		print("Scores:")
+		print(best_hands, "\n")
 		for player, score in list(best_hands.items()):
 			if score == best_score:
 				self.winners.append(player)
@@ -41,10 +42,12 @@ class WinnerCalculator():
 						2 : 'One Pair',
 						1 : 'High Card'}
 
-		print(score_hand_dict[sorted(list(self.best_score_per_player.values()))[-1] // 14])
+		winning_hand = score_hand_dict[sorted(list(self.best_score_per_player.values()))[-1] // 14]
 		for winner, score in list(zip(self.winners, self.scores)):
-			print(winner.name, winner.hand, score)
+			print("Winner:", winner.name, winner.hand)
 		print(self.community)
+		print(winning_hand)
+		print()
 
 
 
@@ -64,8 +67,6 @@ class WinnerCalculator():
 			self.straight_flush(player)
 			self.royal_flush(player)
 		
-
-
 
 	def royal_flush(self, player):
 		best_hand = self._suit_dict(player)
@@ -125,7 +126,6 @@ class WinnerCalculator():
 				return
 
 
-
 	def straight(self, player): # 
 		values = [card.int_value for card in player.hand + self.community]
 		straight = self._check_straight(values)
@@ -133,7 +133,6 @@ class WinnerCalculator():
 			self.best_score_per_player[player] = 5 * 14 + straight - 1
 			self.winning_hand = 'Straight'
 			return
-
 
 
 	def three_of_a_kind(self, player):
@@ -145,14 +144,14 @@ class WinnerCalculator():
 				return
 
 
-
 	def two_pair(self, player):
 		best_hand = self._value_dict(player)
 		has_two = False
+		values = []
 		for value in best_hand:
 			if len(best_hand[value]) == 2:
 				if has_two:
-					self.best_score_per_player[player] = score 
+					self.best_score_per_player[player] = score + round(value / 14, 2)
 					self.winning_hand = 'Two Pair'
 					return
 				has_two = True
@@ -167,11 +166,11 @@ class WinnerCalculator():
 				self.winning_hand = 'One Pair'
 				return
 
+
 	def high_card(self, player):
 		self.best_score_per_player[player] = 1 * 14 + max([card.int_value for card in player.hand + self.community]) - 1
 		self.winning_hand = 'High Card'
 		return
-
 
 
 	def _value_dict(self, player):
@@ -192,7 +191,6 @@ class WinnerCalculator():
 		return best_hand
 
 
-
 	def _suit_dict(self, player):
 		suits = [card.suit for card in player.hand]
 		values = [card.int_value for card in player.hand]
@@ -208,7 +206,6 @@ class WinnerCalculator():
 			else:
 				best_hand[card.suit] = [card.int_value]
 		return best_hand
-
 
 
 	def _check_straight(self, values):

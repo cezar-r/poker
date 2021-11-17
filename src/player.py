@@ -1,21 +1,35 @@
 
 
 class Player():
-	def __init__(self, name, buy_in):
+	def __init__(self, name):
 		self.name = name
-		self.amount = buy_in
+		self.amount = 0
 		self.hand = []
 		self.is_big_blind = False
 		self.is_little_blind = False
 		self.cur_bet = 0
 		self.put_in = 0
+		self.odds = 0
 
 	def __str__(self):
-		return f'{self.name}'
+		string = self.name
+		if self.is_big_blind:
+			string += ' [BB]'
+		elif self.is_little_blind:
+			string += ' [SB]'
+		return string
 
 
 	def __repr__(self):
-		return f'{self.name}'
+		string = self.name
+		if self.is_big_blind:
+			string += ' [BB]'
+		elif self.is_little_blind:
+			string += ' [SB]'
+		return string
+
+	def buyin(self, amount):
+		self.amount = amount
 
 	def reset(self):
 		self.hand = []
@@ -24,7 +38,7 @@ class Player():
 
 
 	def decision(self, amount):
-		decision = input(f'\nTo call: {amount - self.put_in}\n{self.name}\nCall[1]\tFold[2]\tRaise[3]\n')
+		decision = input(f'\n{self.name}\nTo call: {amount - self.put_in}\nCall[1]\tFold[2]\tRaise[3]\n')
 		if decision == '3':
 			raise_amount = int(input('Raise by how much?\n'))
 			assert raise_amount <= self.amount
@@ -37,10 +51,13 @@ class Player():
 
 
 	def play_again(self):
-		play_again = input("Play again? [Y][N]")
+		play_again = input("Play again? [Y][N]\n")
 		if play_again == 'y':
 			return True
-		return False
+		elif play_again == 'a':
+			return 'a'
+		else:
+			return False
 
 
 

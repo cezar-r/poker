@@ -2,16 +2,17 @@ from table import Table
 from deck import Deck 
 from player import Player 
 
-BUYIN = 100
+BUYIN = 1000
 deck = Deck()
 
-player1 = Player("Bob", BUYIN)
-player2 = Player("Joe", BUYIN)
-player3 = Player("Tod", BUYIN)
-player4 = Player("Ron", BUYIN)
+player1 = Player("Bob")
+player2 = Player("Joe")
+player3 = Player("Tod")
+player4 = Player("Ron")
+
 
 def main():
-	table = Table([player1, player2, player3, player4], deck)
+	table = Table([player1, player2, player3, player4], deck, BUYIN)
 	while len(table.players) >= 2:
 		table.play()
 		table.play_again()

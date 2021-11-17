@@ -1,25 +1,33 @@
 import random
 import os
 
+# from poker import Range 
+# from poker.hand import Combo
+
+# import holdem_calc
+# import holdem_functions
+
 from deck import Deck
 from player import Player
 from winner_calculator import WinnerCalculator
 
 
-BIG_BLIND_AMOUNT = 4
-LITTLE_BLIND_AMOUNT = 2
-
-
 class Table:
 
-	def __init__(self, players, deck):
+	def __init__(self, players, deck, buyin):
 		self.players = players
+		for player in self.players:
+			player.buyin(buyin)
 		self.players_in_hand = players
 		self._cards = self._init_deck(deck)
 		self.pot_value = 0
 		self.big_blind_position = 0
 		self.community_cards = []
-		self.call_amount = BIG_BLIND_AMOUNT
+		self.big_blind_amount = buyin // 100
+		self.little_blind_amount = self.big_blind_amount // 2
+		self.call_amount = self.big_blind_amount
+		self.turn = "Pre-Flop"
+
 
 	def play(self):
 		self.display()
@@ -28,33 +36,31 @@ class Table:
 		self.players_in_hand = self.players.copy()
 		cards = self._cards.copy()
 		random.shuffle(cards)
-		self.call_amount = BIG_BLIND_AMOUNT
-		self.pot_value = BIG_BLIND_AMOUNT + LITTLE_BLIND_AMOUNT
+		self.call_amount = self.big_blind_amount
+		self.pot_value = self.big_blind_amount + self.little_blind_amount
 
 		# deal cards
 		for player in self.players_in_hand:
 			if player.is_big_blind:
-				player.amount -= BIG_BLIND_AMOUNT
-				player.put_in = BIG_BLIND_AMOUNT
+				player.amount -= self.big_blind_amount
+				player.put_in = self.big_blind_amount
 				self._update_meta_player(player.name, player.amount)
 			elif player.is_little_blind:
-				player.amount -= LITTLE_BLIND_AMOUNT
-				player.put_in = LITTLE_BLIND_AMOUNT
+				player.amount -= self.little_blind_amount
+				player.put_in = self.little_blind_amount
 				self._update_meta_player(player.name, player.amount)
 			player.hand.append(cards[0])
 			del cards[0]
-			# remove card from cards
 		for player in self.players_in_hand:
 			player.hand.append(cards[0])
 			del cards[0]
-			# remove card from cards
 
-		# first round of betting // pre-flop
 		first_to_go = self.big_blind_position + 2
 		if first_to_go > len(self.players):
 			first_to_go = 0
 
 		self.display()
+		# first round of betting // pre-flop
 		self._bet(first_to_go)
 
 		first_to_go -= 1
@@ -66,20 +72,19 @@ class Table:
 		for i in range(3):
 			self.community_cards.append(cards[i])
 			del cards[i]
-			# remove ith card
 
+		self.turn = "Flop"
 		self.display()
 
 		# secound round of betting // post-flop
 		self._bet(first_to_go)
-
-		self.display()
 
 		# turn
 		del cards[0]
 		self.community_cards.append(cards[0])
 		del cards[0]
 
+		self.turn = "Turn"
 		self.display()
 
 		# fourth round of betting // post-turn
@@ -90,35 +95,94 @@ class Table:
 		self.community_cards.append(cards[0])
 		del cards[0]
 
+		self.turn = "River"
 		self.display()
 
 		# fifth round of betting // post-river
 		self._bet(first_to_go)
 
+		self.display()
 		self.calculate_winner() 
 		self.reset_players()
+		self.turn = "Pre-Flop"
+
+
+	def update_odds(self):
+		for player in self.players_in_hand:
+			print(player.name, player.hand)
+			player.odds = self.calc_odds(player)
+
+
+	def _format_hand(self, hand):
+		hand_str = ''
+		for card in hand:
+			if card.value[0] == 1:
+				hand_str += 'T' + card.suit[0]
+			else:
+				hand_str += card.value[0] + card.suit[0]
+		return Combo(hand_str)
+
+
+	def _format_board(self, flop = False):
+		if not flop:
+			flop = self.community_cards
+		board = []
+		for card in flop:
+			if card.value[0] == 1:
+				board.append('T' + card.suit[0])
+			else:
+				board.append(card.value[0] + card.suit[0])
+		return board
+
+
+	def calc_odds(self, player):
+		hand = self._format_board(player.hand)
+		board = self._format_board()
+
+		print(hand, board)
+
+		odds = holdem_calc.calculate(board, True, 1, False, hand, True)
+		print(odds[:-1])
+		return odds[:-1]
+		# return odds['win']
+
+
 
 
 	def reset_players(self):
 		for player in self.players:
-			player.reset()
+			if player.amount < self.little_blind_amount: # player busted
+				del self.players[self.players.index(player)]
+			else:
+				player.reset() 
 
 
 	def play_again(self):
 		new_players = []
 		for player in self.players:
-			if player.play_again():
+			play_again = player.play_again()
+			if play_again:
+				if play_again == 'a':
+					self._play_all()
+					return 
 				new_players.append(player)
 		self.players = new_players
 
+	def _play_all(self):
+		new_players = []
+		for player in self.players:
+			new_players.append(player)
+		self.players = new_players
 
-	def _bet(self, i):
+	def _bet(self, i: int):
 		betting_list = self._resort_players(i)
 		to_call = betting_list.copy()
 		i = 0
 		prev_raise = 0
 		while len(to_call) > 0:
 			player = to_call[0]
+			print(to_call)
+			self.display(player)
 			decision = player.decision(self.call_amount)
 			if decision[0] == 'raise':
 				amount = decision[1]
@@ -128,7 +192,7 @@ class Table:
 				player.amount -= amount 
 				player.put_in += amount
 				self._update_meta_player(player.name, player.amount)
-				to_call = self._resort_players(self._get_index(player.name, betting_list), betting_list)[:-1]
+				to_call = self._resort_players(self._get_next_index(player.name, betting_list), betting_list)[:-1]
 				prev_raise = amount
 			elif decision[0] == 'call':
 				self.pot_value += self.call_amount - player.put_in
@@ -137,16 +201,15 @@ class Table:
 				self._update_meta_player(player.name, player.amount)
 				del to_call[0]
 			else:
-				self._remove_player(player.name)
+				del self.players_in_hand[self.players_in_hand.index(player)]
 				del to_call[0]
-			self.display()
+				del betting_list[betting_list.index(player)]
+			# next_player = to_call[self._get_next_index(player.name, betting_list)]
 		self._reset_put_in()
 		self.call_amount = 0
 
 
-	# def _continue_betting(self, betting_list):
-
-	def _get_index(self, name, array):
+	def _get_next_index(self, name, array): 
 		for i, player in enumerate(array):
 			if player.name == name:
 				if i == len(array) - 1:
@@ -154,9 +217,11 @@ class Table:
 				else:
 					return i + 1
 
+
 	def _reset_put_in(self):
 		for player in self.players_in_hand:
 			player.put_in = 0
+
 
 	def _update_meta_player(self, name, amount):
 		for player in self.players:
@@ -164,10 +229,10 @@ class Table:
 				player.amount = amount
 
 
-	def _remove_player(self, name):
-		for i in range(len(self.players_in_hand) - 1):
-			if self.players_in_hand[i].name == name:
-				del self.players_in_hand[i]
+	# def _remove_player(self, name):
+	# 	for i in range(len(self.players_in_hand) - 1):
+	# 		if self.players_in_hand[i].name == name:
+	# 			del self.players_in_hand[i]
 
 
 	def calculate_winner(self):
@@ -208,40 +273,26 @@ class Table:
 			if player.is_little_blind:
 				player.is_little_blind = False
 
+
 	def _init_deck(self, deck):
 		return deck.cards
 
 
-	def display (self):
+	def display (self, cur_player = Player(""), odds = False):
+		if odds:
+			self.update_odds()
 		os.system('cls' if os.name == 'nt' else 'clear')
-		print()
-		print(f"Pot value: {self.pot_value}")
-		print()
+		print(f"Pot value: {self.pot_value} ({self.turn})\n")
 		for player in self.players_in_hand:
-			print(player, end = " ")
+			if player.name == cur_player.name:
+				print("●", player, "-", player.amount)
+			else:
+				print(player, "-", player.amount)
 			for card in player.hand:
-				print(card, end = " ")
-			print()
-			print(player.amount)
+				print(card)
 			print()
 		print("Board: ", end = "")
 		for card in self.community_cards:
-			print(card.value + " " + card.suit + " ", end = "")
+			print(card, end = " ")
 		print('\n')
 
-
-
-if __name__ == '__main__':
-	BUYIN = 100
-	deck = Deck()
-
-	player1 = Player("Bob", BUYIN)
-	player2 = Player("Joe", BUYIN)
-	player3 = Player("Tod", BUYIN)
-	player4 = Player("Ron", BUYIN)
-
-	table = Table([player1, player2, player3, player4], deck)
-
-	while len(table.players) >= 2:
-		table.play()
-		table.play_again()
