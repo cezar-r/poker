@@ -1,28 +1,38 @@
+ 
+from deck import Deck
+from itertools import permutations
 
-
+deck = Deck()
+deck.shuffle()
+deck = deck.cards
 
 class WinnerCalculator():
 	
-	def __init__(self, players, community):
+	def __init__(self, players, community, verbose = True):
 		self.players = players
 		self.community = community
 		self.winning_hand = ''
 		self.winners = []
 		self.scores = []
 		self.best_score_per_player = {}
+		self.verbose = verbose
 		self.check()
 
 
 	def check(self):
 		self.get_best_hands()
 		self.compare()
+		if self.verbose:
+			self.print_winners()
 
 
 	def compare(self):
 		best_hands = dict(sorted(list(self.best_score_per_player.items()), key = lambda x: x[1])[::-1])
 		best_score = list(best_hands.values())[0]
-		print("Scores:")
-		print(best_hands, "\n")
+		if self.verbose:
+			print("Scores:")
+			print(best_hands, "\n")
+		self.player_scores = best_hands
 		for player, score in list(best_hands.items()):
 			if score == best_score:
 				self.winners.append(player)
@@ -42,12 +52,15 @@ class WinnerCalculator():
 						2 : 'One Pair',
 						1 : 'High Card'}
 
-		winning_hand = score_hand_dict[sorted(list(self.best_score_per_player.values()))[-1] // 14]
-		for winner, score in list(zip(self.winners, self.scores)):
-			print("Winner:", winner.name, winner.hand)
-		print(self.community)
-		print(winning_hand)
-		print()
+		# print(list(self.best_score_per_player.values()))
+
+		self.winning_hand = score_hand_dict[sorted(list(self.best_score_per_player.values()))[-1] // 14]
+		if self.verbose:
+			for winner, score in list(zip(self.winners, self.scores)):
+				print("Winner:", winner.name, winner.hand)
+			print(self.community)
+			print(self.winning_hand)
+			print()
 
 
 
@@ -227,34 +240,137 @@ class WinnerCalculator():
 		return False
 
 
+
+class OddsCalculator:
+
+	def __init__(self, players, board, deck):
+		self.players = players
+		self.board = board
+		self.deck = deck
+
+	def calculate_odds(self):
+
+		burned = [card for player in self.players for card in player.hand] + [card for card in self.board]
+
+		# # to calculate only from its own hand
+		# if len(self.players) == 1:
+		# 	self._simulate_all_other_hands()
+
+		# to calculate everyones
+		# else:
+		combinations = self.create_combinations()
+		wins = {}
+		hand_scores = {}
+		for hand in combinations:
+			calculator = WinnerCalculator(self.players, hand, verbose = False)
+			scores = calculator.player_scores
+			winner = list(scores.keys())[0]
+			if winner in wins:
+				wins[winner] += 1
+			else:
+				wins[winner] = 1
+			if winner in hand_scores:
+				hand_scores[winner].append(list(scores.values())[0])
+			else:
+				hand_scores[winner] = [list(scores.values())[0]]
+		for player in self.players:
+			if player not in list(wins.keys()):
+				wins[player] = 0
+		self.scores = hand_scores
+		self.odds = dict([(name, round(win/(sum(list(wins.values()))), 2)) for name, win in list(wins.items())])
+
+
+	def create_combinations(self):
+		deck_copy = self.deck.copy()
+		board_copy = self.board.copy()
+		if len(board_copy) == 5:
+			return [board_copy]
+		combinations = []
+		for comb in permutations(deck_copy, 5 - len(board_copy)):
+			for card in comb:
+				board_copy.append(card)
+			combinations.append(board_copy)
+			board_copy = self.board.copy()
+		return combinations
+			
+	def _create_combinations(self, board, deck, boards = []):
+		if len(deck) == 0:
+			return [board]
+		if len(deck) < (5 - len(self.board)):
+			return boards
+		temp_board = self.board.copy()
+		# for i in range(5 - len(self.board)):
+		temp_board.append(deck[0])
+		# boards.append(temp_board)
+		return self._create_combinations(temp_board, deck[1:], boards)
+
+
+def create_board():
+	board = []
+	for i in range(3):
+		board.append(deck[0])
+		del deck[0]
+	return board
+
+
+def create_players(num_players):
+	players = []
+	for i in range(num_players):
+		players.append(Player())
+	for player in players:
+		player.hand = [deck[0], deck[1]]
+		del deck[0]
+		del deck[0]
+	return players
+
+
+def print_odds(players, board):
+	odds = OddsCalculator(players, board, deck)
+	odds.calculate_odds()
+	_odds = odds.odds
+	if len(board) == 3:
+		print("Flop")
+	elif len(board) == 4:
+		print("Turn")
+	elif len(board) == 5:
+		print("River")
+	for player in _odds:
+		for player1 in players:
+			if player.name == player1.name:
+				print(player.name, player.hand, ":", _odds[player])
+	print("\n", "Board: ", board, "\n")
+	print("------------------\n")
+
+
 if __name__ == '__main__':
-	from cards import Card 
 	from player import Player
 
-	player1 = Player("Bob", 1)
-	card1 = Card("clubs", 8)
-	card2 = Card("diamonds", 6)
-	player1.hand = [card1, card2]
+	players = create_players(2)
+	board = create_board()
+
+	print_odds(players, board)
+	board.append(deck[0])
+	del deck[0]
+
+
+	print_odds(players, board)
+	board.append(deck[0])
+	del deck[0]
+
+
+	print_odds(players, board)
 
 
 
-	player2 = Player("Mel", 1)
-	card9 = Card("clubs", 5)
-	card8 = Card("diamonds", 6)
-	player2.hand = [card9, card8]
+'''
+BOARDS TO TEST
 
-	card3 = Card("clubs", 4)
-	card4 = Card("hearts", 3)
-	card5 = Card("diamonds", 2)
-	card6 = Card("diamonds", 7)
-	card7 = Card("clubs", 5)
-
-	community = [card3, card4, card5, card6, card7]
-
-	calc = WinnerCalculator([player1, player2], community)
-	calc.print_winners()
+ A 8 
+ 2 K
+ A Q Q Q
 
 
+3 4
+4 9 4 2 A -> should not be straight
 
-
-
+ '''

@@ -1,4 +1,5 @@
 from cards import SUITS, VALUES, Card
+import random
 
 
 class Deck:
@@ -12,3 +13,11 @@ class Deck:
 			for value in VALUES:
 				cards.append(Card(suit, value))
 		return cards
+
+	def shuffle(self):
+		random.shuffle(self.cards)
+
+
+	def reset(self):
+		self.cards = self._init_cards()
+
