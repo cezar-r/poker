@@ -33,6 +33,9 @@ def get_players_bots():
 	players = get_players()
 	clear()
 	for i in range(num_bots):
+		player = Player()
+		if player.name in [p.name for p in players]:
+			player = Player()
 		players.append(Player())
 	return players
 

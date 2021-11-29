@@ -2,12 +2,6 @@ import random
 import os
 import time
 
-# from poker import Range 
-# from poker.hand import Combo
-
-# import holdem_calc
-# import holdem_functions
-
 from deck import Deck
 from player import Player
 from winner_calculator import WinnerCalculator
@@ -33,9 +27,7 @@ class Table:
 		self.prev_player_decision = ["", ""]
 		self.games = 0
 
-
 	def play(self):
-		# self.display()
 		self.community_cards = []
 		self.move_blinds()
 		self.players_in_hand = self.players.copy()
@@ -64,7 +56,6 @@ class Table:
 		if first_to_go > len(self.players):
 			first_to_go = 0
 
-		# self.display()
 		# first round of betting // pre-flop
 		self._bet(first_to_go)
 		if len(self.players_in_hand) == 1:
@@ -133,55 +124,12 @@ class Table:
 		self.prev_player_decision = ["", ""]
 		self.games += 1
 
-	def update_odds(self):
-		for player in self.players_in_hand:
-			print(player.name, player.hand)
-			player.odds = self.calc_odds(player)
-
-
-	def _format_hand(self, hand):
-		hand_str = ''
-		for card in hand:
-			if card.value[0] == 1:
-				hand_str += 'T' + card.suit[0]
-			else:
-				hand_str += card.value[0] + card.suit[0]
-		return Combo(hand_str)
-
-
-	def _format_board(self, flop = False):
-		if not flop:
-			flop = self.community_cards
-		board = []
-		for card in flop:
-			if card.value[0] == 1:
-				board.append('T' + card.suit[0])
-			else:
-				board.append(card.value[0] + card.suit[0])
-		return board
-
-
-	def calc_odds(self, player):
-		hand = self._format_board(player.hand)
-		board = self._format_board()
-
-		print(hand, board)
-
-		odds = holdem_calc.calculate(board, True, 1, False, hand, True)
-		print(odds[:-1])
-		return odds[:-1]
-		# return odds['win']
-
-
-
-
 	def reset_players(self):
 		for player in self.players:
 			if player.amount < self.little_blind_amount: # player busted
 				del self.players[self.players.index(player)]
 			else:
 				player.reset() 
-
 
 	def play_again(self):
 		if self._humanCount() == 0:
@@ -218,17 +166,15 @@ class Table:
 			player.cur_board = self.community_cards
 			self.display(player)
 			if player.amount > 10:
-
 				decision = player.decision(self.call_amount)
 				if decision[0] == 'raise':
 					amount = decision[1]
 					if player.is_bot and amount < 2 * prev_raise:
-						amoutn = 2 * prev_raise
+						amount = 2 * prev_raise
 					self.pot_value += amount 
 					self.call_amount = amount + player.put_in
 					player.amount -= amount 
 					player.put_in += amount
-					# self._update_to_call_amount()
 					self._update_meta_player(player.name, player.amount)
 					to_call = self._resort_players(self._get_next_index(player.name, betting_list), betting_list)[:-1]
 					prev_raise = amount
@@ -242,7 +188,6 @@ class Table:
 					del self.players_in_hand[self.players_in_hand.index(player)]
 					del to_call[0]
 					del betting_list[betting_list.index(player)]
-				# next_player = to_call[self._get_next_index(player.name, betting_list)]
 				self.prev_player = player
 				self.prev_player_decision = decision
 				if len(self.players_in_hand) == 1:
@@ -250,12 +195,6 @@ class Table:
 
 		self._reset_put_in()
 		self.call_amount = 0
-
-
-	def _update_to_call_amount(self):
-		for player in self.players_in_hand:
-			player.to_call = self.call_amount - player.put_in
-
 
 	def _get_next_index(self, name, array): 
 		for i, player in enumerate(array):
@@ -265,11 +204,9 @@ class Table:
 				else:
 					return i + 1
 
-
 	def _reset_put_in(self):
 		for player in self.players_in_hand:
 			player.put_in = 0
-
 
 	def _update_meta_player(self, name, amount):
 		for player in self.players:
@@ -278,30 +215,25 @@ class Table:
 			if player.amount < 10:
 				del self.players[self.players.index(player)]
 
-
 	def _remove_player(self, name):
 		for i in range(len(self.players_in_hand) - 1):
 			if self.players_in_hand[i].name == name:
 				del self.players_in_hand[i]
 
-
 	def calculate_winner(self, verbose = True):
 		calculator = WinnerCalculator(self.players_in_hand, self.community_cards, verbose)
-		# calculator.print_winners()
 		for winner in calculator.winners:
 			winner.amount += self.pot_value / len(calculator.winners)
 			self._update_meta_player(winner.name, winner.amount)
 
-	
 	def _resort_players(self, i, players = None):
 		if not players:
 			return self.players_in_hand[i:] + self.players_in_hand[:i]
 		else:
 			return players[i:] + players[:i]
 
-
 	def move_blinds(self):
-		self.reset_blinds()
+		self._reset_blinds()
 
 		if self.big_blind_position >= len(self.players) - 1:
 			self.big_blind_position = 0
@@ -315,18 +247,15 @@ class Table:
 		else:
 			self.players[self.big_blind_position + 1].is_little_blind = True
 
-
-	def reset_blinds(self):
+	def _reset_blinds(self):
 		for player in self.players:
 			if player.is_big_blind:
 				player.is_big_blind = False
 			if player.is_little_blind:
 				player.is_little_blind = False
 
-
 	def _init_deck(self, deck):
 		return deck.cards
-
 
 	def _humanCount(self, arr = []):
 		if arr == []:
@@ -337,13 +266,14 @@ class Table:
 				count += 1
 		return count
 
-
 	def display(self, cur_player = Player("doe"), odds = False, arr = [], prev_player = [Player("doe"), ["", ""]], done = False):
 		if not cur_player.is_bot and cur_player.name != "":
 			if self._humanCount() > 1:
 				self.look_away(cur_player)
 		if odds:
-			self.update_odds()
+			# self.update_odds() -> need new odds function
+			pass
+
 		os.system('cls' if os.name == 'nt' else 'clear')
 		print("Game", self.games + 1)
 		print(f"Pot value: {self.pot_value} ({self.turn})")
@@ -372,7 +302,6 @@ class Table:
 		print('\n')
 		if not done and len(self.players_in_hand) == 1:
 			print("Winner:", self.players_in_hand[0].name, "\n")
-
 
 	def look_away(self, cur_player):
 		os.system('cls' if os.name == 'nt' else 'clear')

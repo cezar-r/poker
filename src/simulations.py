@@ -97,29 +97,3 @@ if __name__ == '__main__':
 	sim = Simulation(10000)
 	sim.run_simulation()
 
-
-'''
-2 Player
-Most high-card - two pair
-Some trips
-
-
-3 Player
-Same as 2 player
-
-
-
-{'2': 52.921428000000134, '3': 58.134867000000085, '4': 62.367491000000236, '5': 65.59530700000035, '6': 68.13466100000022}
-
-
-
-
-'''
-
-
-'''
-off flop
-50 49.4 45
-
-
-'''
