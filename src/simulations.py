@@ -36,7 +36,8 @@ class Simulation:
 							'hand' : hand,
 							'board' : board,
 							'winning_hand' : winning_hand,
-							'game_nmbr' : i + 1})
+							'game_nmbr' : i + 1,
+							'players' : j})
 			self.scores[str(j)] = j_scores
 		
 
@@ -53,12 +54,14 @@ class Simulation:
 
 	def _plot(self):
 		for player_count in self.scores:
+			plt.figure(figsize=(14,7))
 			x = []
 			y = []
 			for game in self.scores[player_count]:
 				x.append(game['game_nmbr'])
-				y.append(game['winning_score'])
-			plt.hist(y, bins = 30)
+				y.append(game['winning_hand'])
+			plt.hist(y, bins = len(list(set([game['winning_hand'] for game in self.scores[player_count]]))))
+			plt.title(f"Players: {game['players']}")
 			plt.tight_layout()
 			plt.show()
 

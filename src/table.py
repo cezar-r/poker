@@ -118,13 +118,13 @@ class Table:
 			self.calculate_winner() 
 		else:
 			self.calculate_winner(verbose = False)
-		self.reset_players()
+		self._reset_players()
 		self.turn = "Pre-Flop"
 		self.prev_player = Player("doe")
 		self.prev_player_decision = ["", ""]
 		self.games += 1
 
-	def reset_players(self):
+	def _reset_players(self):
 		for player in self.players:
 			if player.amount < self.little_blind_amount: # player busted
 				del self.players[self.players.index(player)]
@@ -135,7 +135,7 @@ class Table:
 		if self._humanCount() == 0:
 			# play_again = input(f"Play again? [Y][N]\n")
 			play_again = 'y'
-			time.sleep(3)
+			time.sleep(10)
 			if play_again =='y':
 				return
 			else:
@@ -165,23 +165,36 @@ class Table:
 			player = to_call[0]
 			player.cur_board = self.community_cards
 			self.display(player)
+			if player.amount == 0:
+				del to_call[0]
 			if player.amount > 10:
 				decision = player.decision(self.call_amount)
 				if decision[0] == 'raise':
 					amount = decision[1]
-					if player.is_bot and amount < 2 * prev_raise:
-						amount = 2 * prev_raise
-					self.pot_value += amount 
-					self.call_amount = amount + player.put_in
-					player.amount -= amount 
-					player.put_in += amount
+					if player.amount < self.call_amount and amount < 2 * prev_raise:
+						amount = player.amount
+						self.pot_value += amount
+						player.amount -= amount
+						player.put_in += amount
+					else:
+						if player.is_bot and amount < 2 * prev_raise:
+							amount = 2 * prev_raise
+						self.pot_value += amount 
+						self.call_amount = amount + player.put_in
+						player.amount -= amount 
+						player.put_in += amount
 					self._update_meta_player(player.name, player.amount)
 					to_call = self._resort_players(self._get_next_index(player.name, betting_list), betting_list)[:-1]
 					prev_raise = amount
 				elif decision[0] == 'call':
-					self.pot_value += self.call_amount - player.put_in
-					player.amount -= self.call_amount - player.put_in
-					player.put_in += self.call_amount - player.put_in
+					if self.call_amount > player.amount:
+						self.pot_value += player.amount
+						player.put_in += player.amount
+						player.amount = 0
+					else:
+						self.pot_value += self.call_amount - player.put_in
+						player.amount -= self.call_amount - player.put_in
+						player.put_in += self.call_amount - player.put_in
 					self._update_meta_player(player.name, player.amount)
 					del to_call[0]
 				else:
@@ -192,9 +205,9 @@ class Table:
 				self.prev_player_decision = decision
 				if len(self.players_in_hand) == 1:
 						return
-
 		self._reset_put_in()
 		self.call_amount = 0
+
 
 	def _get_next_index(self, name, array): 
 		for i, player in enumerate(array):

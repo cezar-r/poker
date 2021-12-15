@@ -56,7 +56,7 @@ class Player():
 
 	def _raise(self, to_call_amount):
 		raise_amount = int(input('Raise by how much?\n'))
-		if raise_amount < 2*to_call_amount:
+		if raise_amount < 2* to_call_amount and self.amount > 2 * to_call_amount:
 			print(f'Reraise must be at least double previous raise ({to_call_amount *2})\n')
 			return self._raise(to_call_amount)
 		elif raise_amount > self.amount:
@@ -133,23 +133,35 @@ class Player():
 
 			# if they check on the river, raise
 			if len(self.cur_board) == 5: 
-				return ('raise', round(max_put_in // 3 + 50, -1))
+				return ('raise', round(max_put_in // 6 + 50, -1))
 
 			# if they check on the turn, raise
 			elif len(self.cur_board) == 4: 
-				return ('raise', round(max_put_in // 6, -1))
+				return ('raise', round(max_put_in // 12, -1))
 
 			# raise less
-			return ('raise', round(max_put_in // 10 + 10, -1))
+			return ('raise', round(max_put_in // 20 + 10, -1))
 
 		if to_call_amount > max_put_in * 1.1:
 
+			# if the bet is not too big and we have a decent hand on the preflop, call sometimes
+			if to_call_amount / self.amount > .2 and self.willing_to_bet > .1 and random.randint(1,15) == 7 and len(self.cur_board) == 0:
+				return ('call', 0)
+
 			# if the bet is not too big and we have a decent hand on the flop, call sometimes
-			if to_call_amount / self.amount > .2 and self.willing_to_bet > .1 and random.randint(0,10) == 7 and len(self.cur_board) == 3:
+			elif to_call_amount / self.amount > .2 and self.willing_to_bet > .1 and random.randint(0,10) == 7 and len(self.cur_board) == 3:
 				return ('call', 0)
 
 			# if the bet is not too big and we have a decent hand on the river, call sometimes
-			elif to_call_amount / self.amount > .2 and self.willing_to_bet > .05 and random.randint(0,5) == 2 and len(self.cur_board) == 5:
+			elif to_call_amount / self.amount > .2 and self.willing_to_bet > .1 and random.randint(0,5) == 2 and len(self.cur_board) == 5:
+				return ('call', 0)
+
+			# if the bet is very large and we have a decent hand before the turn, call sometimes
+			elif to_call_amount / self.amount > .5 and self.willing_to_bet > .1 and random.randint(0,10) == 7 and len(self.cur_board) < 4:
+				return ('call', 0)
+
+			# if the bet is very large and we have a strong hand after the turn, call sometimes
+			elif to_call_amount / self.amount > .5 and self.willing_to_bet > .2 and random.randint(0,10) == 7 and len(self.cur_board) >= 4:
 				return ('call', 0)
 
 			# otherwise fold
@@ -205,7 +217,7 @@ class Player():
 		
 	def _bluff(self):
 		if not self.play_bluff:
-			x = random.randint(0,50)
+			x = random.randint(0, random.randint(5, 25))
 			if x == 17 and self.willing_to_bet < .1:
 				self.play_bluff = True
 		else:
