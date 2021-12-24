@@ -29,6 +29,6 @@ Poker has been a passion of mine since the start of Covid-19 and I decided to re
 <img src = "https://github.com/cezar-r/poker/blob/main/cli_poker.png" width = 500 height = 400> 
 
 ## In Action
- - [Here](https://youtu.be/ra7i8MT12_c) is a video of the bots in action against each other. When a blank name is entered for the player, it creates a bot player, which allows us to see the bots play against each other. When there are no real players in the game, cards are visible at all times.
- - [Here]() is a video of me playing against the bots
- - [Here]() is a video of me playing heads up against somebody
+ - [Here](https://youtu.be/v9OCOeNVRB0) is a video of the bots in action against each other. When a blank name is entered for the player, it creates a bot player, which allows us to see the bots play against each other. When there are no real players in the game, cards are visible at all times.
+ - [Here](https://youtu.be/5cnmK71ml3A) is a video of me playing against the bots
+ - [Here](https://youtu.be/VgU-eqv-a_Q) is a video of me playing heads up against somebody
