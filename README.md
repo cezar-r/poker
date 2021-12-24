@@ -25,4 +25,10 @@ Poker has been a passion of mine since the start of Covid-19 and I wanted to rec
  - The least mathematical part of poker is bluffing. Bluffing goes against all the logic explained above, which is why its important to implement it; we do not want the bot to be predictable. Therefore, the bot will randomly decide its going to bluff on any hand and will increase its max_put_in to half it's stack on the flop, 3/4 of the stack on the turn and everything on the river. 
 
 ## Display
- - Not that the entire game logic is implemented, it needs to be displayed on the command line. Below is an example of what a game would look like:
+ - Now that the entire game logic is implemented, it needs to be displayed on the command line. Below is an example of what a game would look like:
+<img src = "https://github.com/cezar-r/poker/blob/main/cli_poker.png" width = 500 height = 400> 
+
+## In Action
+ - [Here](https://youtu.be/ra7i8MT12_c) is a video of the bots in action against each other.
+ - [Here]() is a video of me playing against the bots
+ - [Here]() is a video of me playing heads up against somebody
