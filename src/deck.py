@@ -16,15 +16,6 @@ class Deck:
 	----------
 	cards : list
 		list of all cards
-	
-	Methods
-	-------
-	_init_cards()
-		Adds all the cards to the deck
-	shuffle()
-		Shuffles the list of cards
-	reset()
-		Calls the _init_cards() method
 	"""
 	def __init__(self):
 		self.cards = self._init_cards()
