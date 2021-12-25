@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+File containing the Simulation object
+"""
+
 import matplotlib.pyplot as plt 
 import numpy as np
 import random
@@ -8,9 +14,19 @@ from winner_calculator import WinnerCalculator
 deck = Deck()
 plt.style.use("dark_background")
 
-
 class Simulation:
-
+	"""
+	A class that represents a series of simulations
+	
+	Attributes
+	----------
+	iters : int
+		Number of games to simulate
+	deck : list
+		List of cards representing the deck
+	plot : bool
+		Whether or not to plot the results.
+	"""
 	def __init__(self, iters = 1000, plot = True):
 		self.iters = iters
 		self.deck = deck.cards
@@ -18,6 +34,7 @@ class Simulation:
 
 
 	def run_simulation(self):
+		"""Method that runs the simulations"""
 		self.scores = {}
 		for j in range(2, 7):
 			j_scores = []
@@ -53,6 +70,7 @@ class Simulation:
 
 
 	def _plot(self):
+		"""Method that plots the results"""
 		for player_count in self.scores:
 			plt.figure(figsize=(14,7))
 			x = []
@@ -68,10 +86,24 @@ class Simulation:
 
 
 	def _shuffle(self):
+		"""Method that shuffles the deck"""
 		random.shuffle(self.deck)
 
 
 	def _create_board(self, deck):
+		"""
+		Method that creates the board
+		
+		Parameters
+		----------
+		deck : list
+			List of cards representing the deck
+		
+		Returns
+		-------
+		board : list
+			List of cards representing the board
+		"""
 		board = []
 		for i in range(5):
 			board.append(deck[0])
@@ -80,6 +112,19 @@ class Simulation:
 
 
 	def _init_players(self, num_players = 6):
+		"""
+		Method that creates <num_players> players
+		
+		Parameters
+		----------
+		num_players : int
+			Number of players to initialize
+		
+		Returns
+		-------
+		players : list
+			List of Player objects
+		"""
 		players = []
 		for i in range(num_players):
 			player = Player()
@@ -88,6 +133,16 @@ class Simulation:
 
 
 	def _deal_cards(self, players, deck):
+		"""
+		Method that deals cards to each player
+		
+		Parameters
+		----------
+		players : list
+			List of players in game
+		deck : list
+			List of cards representing the deck
+		"""
 		for player in players:
 			player.hand = [deck[0], deck[1]]
 			del deck[0]
@@ -99,4 +154,3 @@ class Simulation:
 if __name__ == '__main__':
 	sim = Simulation(10000)
 	sim.run_simulation()
-
