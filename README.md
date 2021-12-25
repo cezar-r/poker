@@ -1,7 +1,7 @@
 # Texas No Limit Hold'em Poker CLI Interface
 
 ## Background
-Poker has been a passion of mine since the start of Covid-19 and I decided to recreate this classic game as a fun project. If you are not familiar with poker rules, give [this](https://www.pokernews.com/poker-rules/texas-holdem.htm#:~:text=In%20a%20game%20of%20no-limit%20Texas%20hold%27em%2C%20the,raise%20is%20always%20exactly%20twice%20the%20big%20blind.) a quick read.
+Poker has been a passion of mine since for some time now and I decided to recreate this classic game as a fun project. If you are not familiar with poker rules, give [this](https://www.pokernews.com/poker-rules/texas-holdem.htm#:~:text=In%20a%20game%20of%20no-limit%20Texas%20hold%27em%2C%20the,raise%20is%20always%20exactly%20twice%20the%20big%20blind.) a quick read.
 
 ## Groundwork
 
