@@ -20,11 +20,6 @@ class Card:
 		value of the card
 	int_value: int
 		integer representation of value
-	
-	Methods
-	-------
-	_calc_value()
-		calculates int_value
 	"""
 
 	def __init__(self, suit, value):
