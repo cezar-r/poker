@@ -1,4 +1,6 @@
- 
+ #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""File containing the WinnerCalculator and OddsCalculator objects"""
 from deck import Deck
 from itertools import permutations
 
@@ -7,7 +9,18 @@ deck.shuffle()
 deck = deck.cards
 
 class WinnerCalculator():
+	"""
+	A class representing the calculator used to calculate who won the game
 	
+	Attributes
+	----------
+	players : list
+		List of players
+	community : list
+		List of cards on board
+	verbose : bool
+		Whether or not to print various items
+	"""
 	def __init__(self, players, community, verbose = True):
 		self.players = players
 		self.community = community
@@ -20,6 +33,7 @@ class WinnerCalculator():
 
 
 	def check(self):
+		"""Parent method that checks who wins"""
 		self.get_best_hands()
 		self.compare()
 		if self.verbose:
@@ -27,6 +41,7 @@ class WinnerCalculator():
 
 
 	def compare(self):
+		"""Method that gets the winner by comparing scores of each hand"""
 		best_hands = dict(sorted(list(self.best_score_per_player.items()), key = lambda x: x[1])[::-1])
 		best_score = list(best_hands.values())[0]
 		if self.verbose:
@@ -41,6 +56,7 @@ class WinnerCalculator():
 
 
 	def print_winners(self):
+		"""Method that prints who won"""
 		score_hand_dict = {10 : 'Royal Flush',
 						9 : 'Straight Flush',
 						8 : 'Four of a Kind',
@@ -65,6 +81,7 @@ class WinnerCalculator():
 
 
 	def get_best_hands(self, players = None):
+		"""Method that checks each possible hand for each player"""
 		if not players:
 			players = self.players
 
@@ -82,6 +99,7 @@ class WinnerCalculator():
 		
 
 	def royal_flush(self, player):
+		"""Method that checks for a royal flush"""
 		best_hand = self._suit_dict(player)
 		for suit in best_hand:
 			if sorted(best_hand[suit]) == [10, 11, 12, 13, 14]:
@@ -91,6 +109,7 @@ class WinnerCalculator():
 
 
 	def straight_flush(self, player):
+		"""Method that checks for a straight flush"""
 		best_hand = self._suit_dict(player)
 		for suit in best_hand:
 			straight = self._check_straight(best_hand[suit])
@@ -101,6 +120,7 @@ class WinnerCalculator():
 
 
 	def four_of_a_kind(self, player):
+		"""Method that checks for a four of a kind"""
 		best_hand = self._value_dict(player)
 		for value in best_hand:
 			if len(best_hand[value]) == 4:
@@ -109,6 +129,7 @@ class WinnerCalculator():
 				return
 
 	def full_house(self, player):
+		"""Method that checks for a full house"""
 		best_hand = self._value_dict(player)
 		has_3 = False
 		has_2 = False
@@ -131,6 +152,7 @@ class WinnerCalculator():
 
 
 	def flush(self, player):
+		"""Method that checks for a flush"""
 		best_hand = self._suit_dict(player)
 		for suit in best_hand:
 			if len(best_hand[suit]) == 5:
@@ -139,7 +161,8 @@ class WinnerCalculator():
 				return
 
 
-	def straight(self, player): # 
+	def straight(self, player): 
+		"""Method that checks for a straight"""
 		values = [card.int_value for card in player.hand + self.community]
 		straight = self._check_straight(values)
 		if straight:
@@ -149,6 +172,7 @@ class WinnerCalculator():
 
 
 	def three_of_a_kind(self, player):
+		"""Method that checks for a three of a kind"""
 		best_hand = self._value_dict(player)
 		for value in best_hand:
 			if len(best_hand[value]) == 3:
@@ -158,6 +182,7 @@ class WinnerCalculator():
 				
 
 	def two_pair(self, player):
+		"""Method that checks for a two pair"""
 		best_hand = self._value_dict(player)
 		has_two = False
 		values = []
@@ -177,6 +202,7 @@ class WinnerCalculator():
 
 
 	def one_pair(self, player):
+		"""Method that checks for a pair"""
 		best_hand = self._value_dict(player)
 		score = 0
 		has_pair = False
@@ -195,12 +221,16 @@ class WinnerCalculator():
 		return
 
 	def high_card(self, player):
+		"""Method that checks for a high card"""
 		self.best_score_per_player[player] = 1 * 14 + max([card.int_value for card in player.hand + self.community]) - 1
 		self.winning_hand = 'High Card'
 		return
 
 
 	def _value_dict(self, player):
+		"""
+		Method that gets a dictionary in the format as: {value : [cards of one value]
+		"""
 		suits = [card.suit for card in player.hand]
 		values = [card.int_value for card in player.hand]
 		best_hand = {}
@@ -219,6 +249,9 @@ class WinnerCalculator():
 
 
 	def _suit_dict(self, player):
+		"""
+		Method that gets a dictionary in the format as: {suit : [cards of one suit]
+		"""
 		suits = [card.suit for card in player.hand]
 		values = [card.int_value for card in player.hand]
 		best_hand = {}
@@ -236,6 +269,7 @@ class WinnerCalculator():
 
 
 	def _check_straight(self, values):
+		"""Helper method that checks for a straight"""
 		prev_value = -1
 		in_a_row = 1
 		straight = []
@@ -256,6 +290,19 @@ class WinnerCalculator():
 
 
 class OddsCalculator:
+	"""
+	A class representing a calculator to get the average score
+	
+	Attributes
+	----------
+	
+	players : list
+		List of players
+	board : list
+		List of cards representing the board
+	deck : list
+		List of cards representing the deck
+	"""
 
 	def __init__(self, players, board, deck):
 		self.players = players
@@ -263,15 +310,8 @@ class OddsCalculator:
 		self.deck = deck
 
 	def calculate_odds(self):
-
+		"""Method that simulates every possible combination and gets an average score"""
 		burned = [card for player in self.players for card in player.hand] + [card for card in self.board]
-
-		# # to calculate only from its own hand
-		# if len(self.players) == 1:
-		# 	self._simulate_all_other_hands()
-
-		# to calculate everyones
-		# else:
 		combinations = self.create_combinations()
 		wins = {}
 		hand_scores = {}
@@ -295,6 +335,7 @@ class OddsCalculator:
 
 
 	def create_combinations(self):
+		"""Method that creates every possible combination of the board"""
 		deck_copy = self.deck.copy()
 		board_copy = self.board.copy()
 		if len(board_copy) == 5:
@@ -308,6 +349,7 @@ class OddsCalculator:
 		return combinations
 			
 	def _create_combinations(self, board, deck, boards = []):
+		"""Helper function to create combinations"""
 		if len(deck) == 0:
 			return [board]
 		if len(deck) < (5 - len(self.board)):
@@ -317,7 +359,8 @@ class OddsCalculator:
 		temp_board.append(deck[0])
 		# boards.append(temp_board)
 		return self._create_combinations(temp_board, deck[1:], boards)
-
+'''
+TESTING
 
 def create_board():
 	board = []
@@ -377,14 +420,3 @@ if __name__ == '__main__':
 
 
 '''
-BOARDS TO TEST
-
- A 8 
- 2 K
- A Q Q Q
-
-
-3 4
-4 9 4 2 A -> should not be straight
-
- '''
