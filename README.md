@@ -12,6 +12,7 @@ Poker has been a passion of mine since for some time now and I decided to recrea
  
  ## Bot Logic
   - While there are Poker AI programs out there that are very intelligent and beat professionals, I did not take this route as I do not have enough exposure to game theory nor do I have the computational power to host such a powerful program. Instead, I implemented decision logic based on my experience from playing poker and what I believe is an optimal strategy. The key factors in the decision making is the attribute max_put_in, which represents the most amount of money the bot is willing to risk on any given hand.
+  - The code for the logic is located in [player.py](https://github.com/cezar-r/poker/blob/main/src/player.py) in the play_hand() method starting on line 284.
  
  ### Pre-Flop
   - To play the pre-flop betting round, we analyze our hand and look for a pocket pair, suited cards, connectors, or suited connectors. These each return a score, the better the hand the better the score. For example, two Ace's will have a higher score than 8 9 suited. The max_put_in is then calculated from this score. In practice, we would hope to see a bot with 7 2 fold to a raise, for example.
