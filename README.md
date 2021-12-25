@@ -32,3 +32,10 @@ Poker has been a passion of mine since the start of Covid-19 and I decided to re
  - [Here](https://youtu.be/v9OCOeNVRB0) is a video of the bots in action against each other. When a blank name is entered for the player, it creates a bot player, which allows us to see the bots play against each other. When there are no real players in the game, cards are visible at all times.
  - [Here](https://youtu.be/5cnmK71ml3A) is a video of me playing against the bots
  - [Here](https://youtu.be/VgU-eqv-a_Q) is a video of me playing heads up against somebody
+
+## Closing Thoughts
+ - Ther are still quite a few tweaks needed to be made to the bot logic to make it even better, which are in the works. The main goal with this project is to create a website where you could play with real money against real people around the world.
+
+## Technologies Used
+ - Matplotlib
+ - Numpy
