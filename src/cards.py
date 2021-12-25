@@ -1,8 +1,31 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+'''
+This file contains the Card object
+'''
+
 SUITS = ['clubs', 'hearts', 'spades', 'diamonds']
 VALUES = ['2', '3', '4', '5', '6', '7' ,'8', '9', '10', 'J', 'Q', 'K', 'A']
 
 
 class Card:
+	"""
+	A class to represent a card
+	
+	Attributes
+	----------
+	suit: str
+		suit of the card
+	value: str
+		value of the card
+	int_value: int
+		integer representation of value
+	
+	Methods
+	-------
+	_calc_value()
+		calculates int_value
+	"""
 
 	def __init__(self, suit, value):
 		self.suit = suit
@@ -18,6 +41,14 @@ class Card:
 
 
 	def _calc_value(self):
+		"""
+		Calculates card integer value
+		
+		Returns
+		-------
+		int
+			value of card
+		"""
 		if self.value == 'J':
 			return 11
 		elif self.value == 'Q':
