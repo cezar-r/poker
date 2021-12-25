@@ -34,7 +34,7 @@ Poker has been a passion of mine since for some time now and I decided to recrea
  - [Here](https://youtu.be/VgU-eqv-a_Q) is a video of me playing heads up against somebody
 
 ## Closing Thoughts
- - There are still quite a few tweaks needed to be made to the bot logic to make it even better, which are in the works. The main goal with this project is to create a website where you could play with real money against real people around the world.
+ - There are still quite a few tweaks needed to be made to the bot logic, which are still in the works. The main goal with this project is to create a website where you could play with real money against real people around the world.
 
 ## Technologies Used
  - Matplotlib
