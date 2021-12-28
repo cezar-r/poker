@@ -11,7 +11,7 @@ Poker has been a passion of mine for some time now and I decided to recreate thi
  - Lastly, we need the table. The [table](https://github.com/cezar-r/poker/blob/main/src/table.py) object contains the deck, list of players, pot value, and the current board (or community cards). For each turn on the board, there is a betting cycle that takes place under the bet() method. 
  
  ## Bot Logic
-  - While there are Poker AI programs out there that are very intelligent and beat professionals, I did not take this route as I do not have enough exposure to game theory nor do I have the computational power to host such a powerful program. Instead, I implemented decision logic based on my experience from playing poker and what I believe is an optimal strategy. The key factors in the decision making is the attribute max_put_in, which represents the most amount of money the bot is willing to risk on any given hand.
+  - While there are Poker AI programs out there that are very intelligent and beat professionals, I did not take this route as I do not have enough exposure to game theory nor do I have the computational power to host such a powerful program. Instead, I implemented decision logic based on my experience from playing poker and what I believe is an optimal strategy. The key factor in the decision making is the attribute max_put_in, which represents the most amount of money the bot is willing to risk on any given hand.
   - The code for the logic is located in [player.py](https://github.com/cezar-r/poker/blob/f567434c0699769e77794e2bfec942f08c7c908b/src/player.py#L284) in the play_hand() method starting on line 284.
  
  ### Pre-Flop
